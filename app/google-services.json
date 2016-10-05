@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "899568251629",
+    "project_id": "firebase-restmycase"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899568251629:android:3679d67346bcb22e",
+        "android_client_info": {
+          "package_name": "com.example.acer.restmycase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "899568251629-7hnk727gmit8f4t7jf28itoips4g5k3v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.acer.restmycase",
+            "certificate_hash": "241169199AAF933481E558FB532FE5E34B1ADF08"
+          }
+        },
+        {
+          "client_id": "899568251629-eqqa0dvh6gj14ob7tflo30isfieuc2kf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4A5h_FFyZFjuQ2L47IwCtdTGTJhjDf0E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
