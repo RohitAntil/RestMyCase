@@ -7,14 +7,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -24,8 +19,6 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
@@ -126,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if(result.isSuccess()) {
-               Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+               Intent intent = new Intent(MainActivity.this, LogOutActivity.class);
                 GoogleSignInAccount acct = result.getSignInAccount();
 
                 intent.putExtra("display_name" ,acct.getDisplayName());
@@ -153,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements
             Log.e(TAG, "display name: " + acct.getDisplayName());
             Toast.makeText(getApplicationContext(), "Signed IN account name: " + acct.getDisplayName(), Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                Intent intent = new Intent(MainActivity.this, LogOutActivity.class);
                 intent.putExtra("display_name" ,acct.getDisplayName());
                 intent.putExtra("email" ,acct.getEmail());
 
