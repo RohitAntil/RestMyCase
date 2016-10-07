@@ -4,19 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     tools:context=".MainActivity"
     android:weightSum="1">
-    <TextView
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
+
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="398dp"
-        android:id="@+id/txtView"
-        android:gravity="center"/>
+        android:layout_height="450dp"
+        android:src="@drawable/lawyer"
+        />
+
     <com.google.android.gms.common.SignInButton
         android:id="@+id/btn_sign_in"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="10dp"
         android:layout_weight="0.54" />
 
 </LinearLayout>
