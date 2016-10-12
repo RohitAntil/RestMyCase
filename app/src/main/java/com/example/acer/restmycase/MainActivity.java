@@ -2,6 +2,7 @@ package com.example.acer.restmycase;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,28 +28,43 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public class MainActivity extends AppCompatActivity implements
         View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
-
+    private static String url = "http://localhost/restmycase/create_product.php";
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 007;
+    private static final String TAGG = "LoginActivity";
+    private static final int REQUEST_SIGNUP = 0;
+    @InjectView(R.id.input_email)
+    EditText _emailText;
+    @InjectView(R.id.input_password)
+    EditText _passwordText;
+    @InjectView(R.id.btn_login)
+    Button _loginButton;
+    @InjectView(R.id.link_signup)
+    TextView _signupLink;
 
     private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
 
     private SignInButton btnSignIn;
-    Toolbar mToolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-
+        ButterKnife.inject(this);
         btnSignIn = (SignInButton) findViewById(R.id.btn_sign_in);
         btnSignIn.setOnClickListener(this);
 
@@ -60,7 +80,97 @@ public class MainActivity extends AppCompatActivity implements
         // Customizing G+ button
         btnSignIn.setSize(SignInButton.SIZE_STANDARD);
         btnSignIn.setScopes(gso.getScopeArray());
+        _loginButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                login();
+            }
+        });
+
+        _signupLink.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // Start the Signup activity
+                Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
+                startActivityForResult(intent, REQUEST_SIGNUP);
+            }
+        });
     }
+
+    public void login() {
+        Log.d(TAG, "Login");
+
+        if (!validate()) {
+            onLoginFailed();
+            return;
+        }
+
+        _loginButton.setEnabled(false);
+
+        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this,
+                R.style.MyAlertDialogStyle);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Authenticating...");
+        progressDialog.show();
+
+        String email = _emailText.getText().toString();
+        String password = _passwordText.getText().toString();
+
+        // TODO: Implement your own authentication logic here.
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        // On complete call either onLoginSuccess or onLoginFailed
+                        onLoginSuccess();
+                        // onLoginFailed();
+                        progressDialog.dismiss();
+                    }
+                }, 3000);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // disable going back to the MainActivity
+        moveTaskToBack(true);
+    }
+
+    public void onLoginSuccess() {
+        _loginButton.setEnabled(true);
+        //  finish();
+    }
+
+    public void onLoginFailed() {
+        Toast.makeText(getBaseContext(), "Login failed.Please Verify Credentials.", Toast.LENGTH_LONG).show();
+
+        _loginButton.setEnabled(true);
+    }
+
+    public boolean validate() {
+        boolean valid = true;
+
+        String email = _emailText.getText().toString();
+        String password = _passwordText.getText().toString();
+
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _emailText.setError("enter a valid email address");
+            valid = false;
+        } else {
+            _emailText.setError(null);
+        }
+
+        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
+            _passwordText.setError("between 4 and 10 alphanumeric characters");
+            valid = false;
+        } else {
+            _passwordText.setError(null);
+        }
+
+        return valid;
+    }
+
 
     @Override
     public void onStart() {
@@ -102,7 +212,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -122,23 +231,31 @@ public class MainActivity extends AppCompatActivity implements
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if(result.isSuccess()) {
-               Intent intent = new Intent(MainActivity.this, LogOutActivity.class);
+            if (result.isSuccess()) {
+                Intent intent = new Intent(MainActivity.this, LogOutActivity.class);
                 GoogleSignInAccount acct = result.getSignInAccount();
 
-                intent.putExtra("display_name" ,acct.getDisplayName());
-                intent.putExtra("email" ,acct.getEmail());
-                if(acct.getPhotoUrl()==null)
+                intent.putExtra("display_name", acct.getDisplayName());
+                intent.putExtra("email", acct.getEmail());
+                if (acct.getPhotoUrl() == null)
                     intent.putExtra("url", "null");
                 else
-                    intent.putExtra("url",acct.getPhotoUrl().toString());
+                    intent.putExtra("url", acct.getPhotoUrl().toString());
                 startActivity(intent);
-             Toast.makeText(MainActivity.this,"Sign In Successful",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Sign In Successful", Toast.LENGTH_SHORT).show();
 
-           }
+            }
+        } else {
+            if (requestCode == REQUEST_SIGNUP) {
+                if (resultCode == RESULT_OK) {
+
+                    // TODO: Implement successful signup logic here
+                    // By default we just finish the Activity and log them in automatically
+                    this.finish();
+                }
+            }
         }
     }
-
 
 
     private void handleSignInResult(GoogleSignInResult result) {
@@ -150,21 +267,22 @@ public class MainActivity extends AppCompatActivity implements
             Log.e(TAG, "display name: " + acct.getDisplayName());
             Toast.makeText(getApplicationContext(), "Signed IN account name: " + acct.getDisplayName(), Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(MainActivity.this, LogOutActivity.class);
-                intent.putExtra("display_name" ,acct.getDisplayName());
-                intent.putExtra("email" ,acct.getEmail());
+            Intent intent = new Intent(MainActivity.this, LogOutActivity.class);
+            intent.putExtra("display_name", acct.getDisplayName());
+            intent.putExtra("email", acct.getEmail());
 
-            if(acct.getPhotoUrl()==null)
+            if (acct.getPhotoUrl() == null)
                 intent.putExtra("url", "null");
             else
-                intent.putExtra("url",acct.getPhotoUrl().toString());
-                startActivity(intent);
+                intent.putExtra("url", acct.getPhotoUrl().toString());
+            startActivity(intent);
 
         } else {
             // Signed out, show unauthenticated UI.
             Toast.makeText(getApplicationContext(), "Please Sign In", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
@@ -180,25 +298,5 @@ public class MainActivity extends AppCompatActivity implements
             mProgressDialog.hide();
         }
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

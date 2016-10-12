@@ -33,6 +33,7 @@ public class LogOutActivity extends AppCompatActivity implements View.OnClickLis
     private ImageView imgProfilePic;
     private TextView txtName, txtEmail;
     private Toolbar mToolbar;
+
     private static final String TAG = LogOutActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +138,7 @@ public class LogOutActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onResult(Status status) {
                         //updateUI(false);
+                        signOut();
                     }
                 });
     }
