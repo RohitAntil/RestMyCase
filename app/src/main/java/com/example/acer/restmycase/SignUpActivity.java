@@ -1,5 +1,6 @@
 package com.example.acer.restmycase;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -84,11 +85,10 @@ public class SignUpActivity extends AppCompatActivity {
 
         _signupButton.setEnabled(false);
 
-//        final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this,
-//                R.style.MyAlertDialogStyle);
-//        progressDialog.setIndeterminate(true);
-//        progressDialog.setMessage("Creating Account...");
-//        progressDialog.show();
+       final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this, R.style.MyAlertDialogStyle);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Creating Account...");
+        progressDialog.show();
 
          name = _nameText.getText().toString();
          email = _emailText.getText().toString();
@@ -103,7 +103,7 @@ public class SignUpActivity extends AppCompatActivity {
                         // depending on success
                         onSignupSuccess();
                         // onSignupFailed();
-                    //    progressDialog.dismiss();
+                        progressDialog.dismiss();
                     }
                 }, 1000);
     }
@@ -118,17 +118,17 @@ public class SignUpActivity extends AppCompatActivity {
 
     public void onSignupFailed() {
 
-        Toast.makeText(getBaseContext(), "SignUp failed.Please verify credentials. ", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "SignUp failed.Please verify credentials. ", Toast.LENGTH_SHORT).show();
 
         _signupButton.setEnabled(true);
     }
 
     public boolean validate() {
         boolean valid = true;
-
+        password = _passwordText.getText().toString();
        name = _nameText.getText().toString();
        email = _emailText.getText().toString();
-        password = _passwordText.getText().toString();
+
 
         if (name.isEmpty() || name.length() < 3) {
             _nameText.setError("at least 3 characters");
@@ -165,11 +165,17 @@ public class SignUpActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            pDialog = new ProgressDialog(SignUpActivity.this);
-            pDialog.setMessage("Signing up ..");
-            pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
-            pDialog.show();
+//            pDialog = new ProgressDialog(SignUpActivity.this);
+//            pDialog.setMessage("Signing up ..");
+//            pDialog.setIndeterminate(false);
+//            pDialog.setCancelable(true);
+//            pDialog.setButton("OK",new DialogInterface.OnClickListener() {
+//                public void onClick(DialogInterface dialog,int which)
+//                {
+//                    dialog.cancel();
+//                }
+//            });
+//            pDialog.show();
         }
 
         /**
@@ -179,8 +185,8 @@ public class SignUpActivity extends AppCompatActivity {
 
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("username", name));
             params.add(new BasicNameValuePair("emailid", email));
+            params.add(new BasicNameValuePair("username", name));
             params.add(new BasicNameValuePair("pass", password));
 
             // getting JSON Object
@@ -188,7 +194,7 @@ public class SignUpActivity extends AppCompatActivity {
             JSONObject json = jsonParser.makeHttpRequest(url_create_product,"POST", params);
 
             // check log cat fro response
-            Log.d("Create Response", json.toString());
+         //   Log.d("Create Response", json.toString());
 
             // check for success tag
             try {
@@ -217,7 +223,7 @@ public class SignUpActivity extends AppCompatActivity {
         protected void onPostExecute(String file_url) {
             // dismiss the dialog once done
            // pDialog.setMessage("Done");
-            pDialog.dismiss();
+          //  pDialog.dismiss();
         }
 
     }
