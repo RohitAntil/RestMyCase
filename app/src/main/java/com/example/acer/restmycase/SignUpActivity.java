@@ -31,8 +31,9 @@ import butterknife.InjectView;
 public class SignUpActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
     JSONParser jsonParser = new JSONParser();
-    private static String url_create_product = "http://localhost/restmycase/create_product.php";
+    private static String url_create_product = "http://192.168.0.7/restmycase/create_product.php";
     ProgressDialog pDialog;
+    ProgressDialog progressDialog;
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
     private String name;
@@ -85,7 +86,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         _signupButton.setEnabled(false);
 
-       final ProgressDialog progressDialog = new ProgressDialog(SignUpActivity.this, R.style.MyAlertDialogStyle);
+       progressDialog = new ProgressDialog(SignUpActivity.this, R.style.MyAlertDialogStyle);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
@@ -103,7 +104,8 @@ public class SignUpActivity extends AppCompatActivity {
                         // depending on success
                         onSignupSuccess();
                         // onSignupFailed();
-                        progressDialog.dismiss();
+                     progressDialog.dismiss();
+
                     }
                 }, 1000);
     }
@@ -113,7 +115,7 @@ public class SignUpActivity extends AppCompatActivity {
          new Signup().execute();
         _signupButton.setEnabled(true);
         setResult(RESULT_OK, null);
-        finish();
+        //finish();
     }
 
     public void onSignupFailed() {
@@ -169,12 +171,6 @@ public class SignUpActivity extends AppCompatActivity {
 //            pDialog.setMessage("Signing up ..");
 //            pDialog.setIndeterminate(false);
 //            pDialog.setCancelable(true);
-//            pDialog.setButton("OK",new DialogInterface.OnClickListener() {
-//                public void onClick(DialogInterface dialog,int which)
-//                {
-//                    dialog.cancel();
-//                }
-//            });
 //            pDialog.show();
         }
 
@@ -191,39 +187,53 @@ public class SignUpActivity extends AppCompatActivity {
 
             // getting JSON Object
             // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_create_product,"POST", params);
+            JSONObject json = jsonParser.makeHttpRequest(url_create_product,"GET", params);
 
             // check log cat fro response
-         //   Log.d("Create Response", json.toString());
-
-            // check for success tag
+            //   check for success tag
+            Log.d("Create Response", json.toString());
             try {
                 int success = json.getInt(TAG_SUCCESS);
 
                 if (success == 1) {
                     // successfully created product
-                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(i);
-
+                    //  Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    //  startActivity(i);
                     // closing this screen
-                    finish();
+                    Log.d("Success", TAG_SUCCESS);
+                    //   Toast.makeText(SignUpActivity.this,"Success",Toast.LENGTH_SHORT);
+                    //  finish();
+                    //  pDialog.setMessage("Sign Up Successful");
                 } else {
                     // failed to create product
+                    Log.d("Success", TAG_SUCCESS);
+                    //   Toast.makeText(SignUpActivity.this,"Failure",Toast.LENGTH_SHORT);
                 }
             } catch (JSONException e) {
+                Log.d(TAG_SUCCESS, "Failure");
                 e.printStackTrace();
             }
-
             return null;
+
         }
 
         /**
          * After completing background task Dismiss the progress dialog
          * **/
-        protected void onPostExecute(String file_url) {
+        protected void onPostExecute(String status) {
             // dismiss the dialog once done
            // pDialog.setMessage("Done");
-          //  pDialog.dismiss();
+          // pDialog.dismiss();
+          //  progressDialog.dismiss();
+//            if(status==null)
+//               onSignupFailed();
+//            else
+//                Toast.makeText(SignUpActivity.this,"Signup Success !!!",Toast.LENGTH_SHORT);
+
+            _emailText.setText("");
+            _nameText.setText("");
+            _passwordText.setText("");
+            _passwordText.clearFocus();
         }
 
     }
